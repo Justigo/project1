@@ -1,5 +1,8 @@
 package recommender;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+
 /**
  * A custom linked list that stores user info. Each node in the list is of type
  * recommender.UserNode.
@@ -25,6 +28,21 @@ public class UsersList {
         // if not, create it and append to this list.
         // Then call insert(movieId, rating) method on the recommender.UserNode
         // FILL IN CODE
+        UserNode hold = head;
+        boolean inList = false;
+        while(hold != null){
+            if(hold.getId() == userId){
+                inList = true;
+                hold.insert(movieId, rating);
+                break;
+            }
+            hold = hold.next();
+        }
+        if(!inList){
+            UserNode holdUser = new UserNode(userId);
+            holdUser.insert(movieId, rating);
+            append(holdUser);
+        }
 
     }
 
@@ -35,6 +53,13 @@ public class UsersList {
     public void append(UserNode newNode) {
         // This is where tail will come in handy
         // FILL IN CODE
+        if(head == null){
+            head = newNode;
+            tail = newNode;
+        }else{
+            tail.setNext(newNode);
+            tail = newNode;
+        }
     }
 
     /** Return a recommender.UserNode given userId
@@ -44,7 +69,13 @@ public class UsersList {
      */
     public UserNode get(int userId) {
         // FILL IN CODE
-
+        UserNode hold = head;
+        while(hold != null){
+            if(hold.getId() == userId){
+                return hold;
+            }
+            hold = hold.next();
+        }
         return null; // don't forget to change it
     } // get method
 
@@ -61,7 +92,15 @@ public class UsersList {
     public UserNode findMostSimilarUser(int userid) {
         UserNode mostSimilarUser = null;
         // FILL IN CODE
-
+        UserNode currentUser = get(userid), compareUser = head;
+        while(compareUser != null){
+            if(compareUser.getId() != userid &&
+                    (mostSimilarUser == null ||
+                            currentUser.computeSimilarity(compareUser) > currentUser.computeSimilarity(mostSimilarUser))){
+                mostSimilarUser = compareUser;
+            }
+            compareUser = compareUser.next();
+        }
 
         return mostSimilarUser;
 
@@ -76,6 +115,28 @@ public class UsersList {
      */
     public void print(String filename) {
         // FILL IN CODE
+        try(PrintWriter file = new PrintWriter((filename))){
+            UserNode holdUser = head;
+            RatingNode holdRatings = null;
+            String strForm = "";
+            while(holdUser != null){
+                holdRatings = holdUser.getMovieRatings().getHead();
+                strForm += String.format("(%d) ", holdUser.getId());
+                while(holdRatings != null){
+                    strForm += String.format("%d:%.1f; ", holdRatings.getMovieId(), holdRatings.getMovieRating());
+                    holdRatings = holdRatings.next();
+                }
+                file.println(strForm);
+                holdUser = holdUser.next();
+                strForm = "";
+            }
+            file.flush();
+        } catch (IOException e){
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public static void main(String[] args){
 
     }
 }

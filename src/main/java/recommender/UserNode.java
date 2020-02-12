@@ -51,6 +51,14 @@ public class UserNode {
 
     }
 
+    /**
+     * Returns list of movies that the User has rated
+     * @return list of User rated movies
+     */
+    public RatingsList getMovieRatings(){
+        return movieRatings;
+    }
+
 
     /**
      * Add rating info for a given movie to the MovieRatingsList
@@ -73,8 +81,21 @@ public class UserNode {
      */
     public int[] getFavoriteMovies(int n) {
         // FILL IN CODE
-
-        return null; // don't forget to change
+        RatingNode hold = movieRatings.getNBestRankedMovies(n).getHead(), current = hold;
+        int count = 0;
+        while(current != null){
+            if(count == n){
+                break;
+            }
+            count++;
+            current = current.next();
+        }
+        int[] movieList = new int[count]; //might be less than n
+        for(int x = 0;x < count;x++){
+            movieList[x] = hold.getMovieId();
+            hold = hold.next();
+        }
+        return movieList; // don't forget to change
     }
 
     /**
@@ -85,8 +106,21 @@ public class UserNode {
      */
     public int[] getLeastFavoriteMovies(int n) {
         // FILL IN CODE
-
-        return null; // don't forget to change
+        RatingNode hold = movieRatings.getNWorstRankedMovies(n).getHead(), current = hold;
+        int count = 0;
+        while(current != null){
+            if(count == n){
+                break;
+            }
+            count++;
+            current = current.next();
+        }
+        int[] movieList = new int[count]; //might be less than n
+        for(int x = 0;x < count;x++){
+            movieList[x] = hold.getMovieId();
+            hold = hold.next();
+        }
+        return movieList; // don't forget to change
     }
 
     /**

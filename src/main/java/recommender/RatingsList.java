@@ -75,6 +75,14 @@ public class RatingsList implements Iterable<RatingNode> {
 
     }
 
+    /**
+     * Return the head, all movies that are rated, node.
+     * @return all movies that are rated
+     */
+    public RatingNode getHead(){
+        return head;
+    }
+
 
     /**
      * Insert a new node (with a given movie id and a given rating) into the list.

@@ -81,12 +81,10 @@ public class UserNode {
      */
     public int[] getFavoriteMovies(int n) {
         // FILL IN CODE
+
         RatingNode hold = movieRatings.getNBestRankedMovies(n).getHead(), current = hold;
         int count = 0;
         while(current != null){
-            if(count == n){
-                break;
-            }
             count++;
             current = current.next();
         }

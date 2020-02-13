@@ -94,6 +94,8 @@ public class UsersList {
         // FILL IN CODE
         UserNode currentUser = get(userid), compareUser = head;
         while(compareUser != null){
+
+
             if(compareUser.getId() != userid &&
                     (mostSimilarUser == null ||
                             currentUser.computeSimilarity(compareUser) > currentUser.computeSimilarity(mostSimilarUser))){
@@ -136,7 +138,4 @@ public class UsersList {
         }
     }
 
-    public static void main(String[] args){
-
-    }
 }

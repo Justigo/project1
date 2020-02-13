@@ -96,17 +96,19 @@ public class RatingsList implements Iterable<RatingNode> {
     public void insertByRating(int movieId, double rating) {
         // FILL IN CODE. Make sure to test this method thoroughly
         RatingNode current = head, nextCheck = head, hold = new RatingNode(movieId, rating);
-        if(current ==null){
+        if(head ==null){
             head = hold;
-        }else if(current.next() == null || current.getMovieRating() <= rating){
-            if(current.getMovieRating() < rating){
+        }else if(head.next() == null ||
+                (head.getMovieRating() < rating) ||
+                (head.getMovieRating() == rating && head.getMovieId() < movieId)){
+            if(head.getMovieRating() < rating){
                 hold.setNext(current);
                 head = hold;
 
-            }else if(current.getMovieRating() > rating){
+            }else if(head.getMovieRating() > rating){
                 head.setNext(hold);
             }else{
-                if(current.getMovieId() > movieId){
+                if(head.getMovieId() > movieId){
                     head.setNext(hold);
                 }else{
                     hold.setNext(current);
@@ -121,7 +123,8 @@ public class RatingsList implements Iterable<RatingNode> {
                 current.setNext(hold);
                 break movieRateLoop;
 
-            }else if(current.next().getMovieRating() == rating){
+            }
+            if(current.next().getMovieRating() == rating){
                 nextCheck = current;
                 while(nextCheck != null) {
                     if(nextCheck.next() == null){
@@ -181,9 +184,11 @@ public class RatingsList implements Iterable<RatingNode> {
             current = current.next();
         }
 
+        if(Math.sqrt(matching * xPow2 - x * x) * Math.sqrt(matching * yPow2 - y * y) == 0){
+            return 0;
+        }
         similarity = (matching * xy - x * y)
                     / (Math.sqrt(matching * xPow2 - x * x) * Math.sqrt(matching * yPow2 - y * y));
-
         return similarity;
 
     }
@@ -273,11 +278,8 @@ public class RatingsList implements Iterable<RatingNode> {
         // FILL IN CODE
         RatingsList recommend = new RatingsList();
         RatingNode current = head;
-        recommendLoop:
-        while(current != null){
-            if(n <= 0){
-                break recommendLoop;
-            }
+        while(current != null && n > 0){
+
             recommend.insertByRating(current.getMovieId(), current.getMovieRating());
             n--;
             current = current.next();
@@ -340,7 +342,6 @@ public class RatingsList implements Iterable<RatingNode> {
             newHead = hold;
             current = current.next();
         }
-
         r.head = newHead;
 
         return r;

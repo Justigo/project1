@@ -1,5 +1,8 @@
 package recommender;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.PrintWriter;
 import java.util.HashMap;
 
 /** recommender.MovieRecommender. A class that is responsible for:
@@ -39,7 +42,31 @@ public class MovieRecommender {
      */
     private void loadMovies(String movieFilename) {
         // FILL IN CODE
+        try(BufferedReader file = new BufferedReader(new FileReader(movieFilename))){
+            String line = file.readLine(), movieName = "";
+            String[] holdLine;
+            while((line = file.readLine()) != null){
+                holdLine = line.split(",");
+                if(holdLine[1].contains("\"")){
+                    movieName += holdLine[1].substring(1) + ",";
+                    for(int count = 2;count < holdLine.length;count++){
+                        if((holdLine[count].charAt(holdLine[count].length()-1) + "").equals("\"")){
+                            movieName += holdLine[count].substring(0,holdLine[count].length()-1);
+                            movieMap.put(Integer.parseInt(holdLine[0]),movieName);
+                            movieName = "";
+                            break;
+                        }
+                        movieName += holdLine[count] + ",";
+                    }
+                }else{
+                    movieMap.put(Integer.parseInt(holdLine[0]), holdLine[1]);
+                }
 
+            }
+
+        }catch(Exception e){
+            System.out.println(e.getMessage());
+        }
     }
 
     /**
@@ -48,6 +75,18 @@ public class MovieRecommender {
      */
     private void loadRatings(String ratingsFilename) {
         // FILL IN CODE
+        try(BufferedReader file = new BufferedReader(new FileReader(ratingsFilename))){
+            String line = file.readLine();
+            String[] holdLine;
+            while((line = file.readLine()) != null){
+                holdLine = line.split(",");
+                usersData.insert(Integer.parseInt(holdLine[0]), Integer.parseInt(holdLine[1]),
+                        Double.parseDouble(holdLine[2]));
+
+            }
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
 
     }
 
@@ -70,6 +109,33 @@ public class MovieRecommender {
         // Recommend only the movies that userid has not seen (has not
         // rated).
         // FILL IN CODE
+        int[] currentUserRate = usersData.get(userid).getFavoriteMovies(num*num);
+        int[] similarUserRate = usersData.findMostSimilarUser(userid).getFavoriteMovies(num*num);
+
+        try(PrintWriter file = new PrintWriter(filename)){
+            boolean inList = false;
+            addLoop:
+            for(int simCount = 0;simCount<similarUserRate.length;simCount++){
+                for(int currentCount = 0;currentCount<currentUserRate.length;currentCount++){
+                    if(similarUserRate[simCount] == currentUserRate[currentCount]){
+                        inList = true;
+                        break;
+                    }
+                }
+                if(!inList){
+
+                    file.println(movieMap.get(similarUserRate[simCount]));
+                    num--;
+                }
+                if(num == 0){
+                    break addLoop;
+                }
+                inList = false;
+            }
+            file.flush();
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
 
     }
 
@@ -93,6 +159,34 @@ public class MovieRecommender {
         // Anti-recommend only the movies that userid has not seen (has not
         // rated).
         // FILL IN CODE
+        RatingsList currentRated = usersData.get(userid).getMovieRatings(),
+                simRated = usersData.findMostSimilarUser(userid).getMovieRatings();
+        int[] currentUserRate = usersData.get(userid).getLeastFavoriteMovies(num),
+                simUserRate = usersData.findMostSimilarUser(userid).getLeastFavoriteMovies(num);
+
+        try(PrintWriter file = new PrintWriter(filename)){
+            boolean inList = false;
+            addLoop:
+            for(int simCount = 0;simCount<simUserRate.length;simCount++){
+                if(currentRated.getRating(simUserRate[simCount]) == -1 &&
+                        simRated.getRating(simUserRate[simCount]) == 1.0){
+                    file.println(movieMap.get(simUserRate[simCount]));
+                    num--;
+                }
+
+
+                if(num == 0){
+                    break addLoop;
+                }
+                inList = false;
+            }
+
+
+            file.flush();
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+
     }
 
 }
